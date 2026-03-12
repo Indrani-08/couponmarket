@@ -1,0 +1,11 @@
+node_modules/
+.env
+*.log
+prompt.txt
+backend/query
+frontend/frontend/
+dist/
+build/
+.vscode/
+.idea/
+.DS_Store

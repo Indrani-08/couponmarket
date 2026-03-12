@@ -1,0 +1,21 @@
+/* Auth pages (Login, Register, Forgot Password) - centered card */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--background);
+  padding: 2rem;
+  transition: var(--transition);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--surface);
+  border-radius: 20px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  transition: var(--transition);
+}
