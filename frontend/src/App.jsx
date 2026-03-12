@@ -6,6 +6,7 @@ import MainLayout from "./components/MainLayout";
 import { getStoredUser, isAuthenticated, setStoredUser } from "./utils/auth";
 import { setScopedNumber } from "./utils/userScopedStorage";
 import api from "./services/api";
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
 
 import "./App.css";
 
@@ -96,9 +97,9 @@ function App() {
         <Route 
           path="/admin" 
           element={
-            <ProtectedRoute>
+            <AdminProtectedRoute>
               <AdminDashboard user={user} />
-            </ProtectedRoute>
+            </AdminProtectedRoute>
           } 
         />
       </Routes>
