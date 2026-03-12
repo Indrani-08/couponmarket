@@ -53,7 +53,7 @@ exports.getCoupons = async (req, res) => {
   try {
     const { sortBy, recommended } = req.query;
 
-    let query = {};
+    let query = { status: "AVAILABLE" };
     if (recommended === 'true') {
       query.recommended = true;
     }

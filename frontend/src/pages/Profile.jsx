@@ -203,7 +203,7 @@ function Profile() {
                 </div>
                 <div className="glass-card p-6 text-center hover:border-green-400/50 transition-colors">
                   <FiDollarSign className="text-green-400 text-2xl mx-auto mb-2" />
-                  <div className="text-2xl font-bold">₹{stats?.totalEarnings || 0}</div>
+                  <div className="text-2xl font-bold">₹{profile?.earnings || 0}</div>
                   <div className="text-xs text-text-secondary uppercase tracking-wider">Earnings</div>
                 </div>
               </div>

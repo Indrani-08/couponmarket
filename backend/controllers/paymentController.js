@@ -89,6 +89,7 @@ exports.verifyPayment = async (req, res) => {
     const seller = await User.findById(coupon.userId);
     if (seller) {
       seller.walletBalance = (seller.walletBalance || 0) + coupon.price;
+      seller.earnings = (seller.earnings || 0) + coupon.price;
       await seller.save();
 
       // Razorpay Route: transfer seller's share to their linked account
@@ -142,6 +143,7 @@ exports.dummyCheckout = async (req, res) => {
       const seller = await User.findById(coupon.userId);
       if (seller) {
         seller.walletBalance = (seller.walletBalance || 0) + coupon.price;
+        seller.earnings = (seller.earnings || 0) + coupon.price;
         await seller.save();
       }
     }

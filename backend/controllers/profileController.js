@@ -45,14 +45,9 @@ exports.getUserStats = async (req, res) => {
         const couponsPurchased = await Transaction.countDocuments({ user_id: userId, payment_status: "SUCCESS" });
         const activeCoupons = await Coupon.countDocuments({ userId, status: "AVAILABLE" });
 
-        // Total Earnings (for coupons sold by this user - only the coupon price, excluding platform fee)
-        const userCoupons = await Coupon.find({ userId }).select("_id");
-        const couponIds = userCoupons.map(c => c._id);
-        const transactions = await Transaction.find({ coupon_id: { $in: couponIds }, payment_status: "SUCCESS" })
-            .populate("coupon_id", "price");
-
-        const totalEarnings = transactions.reduce((sum, t) => sum + (t.coupon_id ? t.coupon_id.price : 0), 0);
-
+        const user = await User.findById(userId).select("earnings");
+        const totalEarnings = user?.earnings || 0;
+ 
         res.json({
             couponsCreated,
             couponsPurchased,

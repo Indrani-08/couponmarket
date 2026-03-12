@@ -10,6 +10,7 @@ const transporter = nodemailer.createTransport({
 
 const sendEmail = async (to, subject, html) => {
 
+  console.log(`Sending email to: ${to} | Subject: ${subject}`);
   await transporter.sendMail({
     from: `"Coupon Marketplace" <${process.env.EMAIL_USER}>`,
     to,

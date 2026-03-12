@@ -140,7 +140,7 @@ exports.refreshToken = async (req, res) => {
 
 exports.getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.userId).select("_id email name role createdAt walletBalance");
+    const user = await User.findById(req.userId).select("_id email name role createdAt walletBalance earnings");
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -152,7 +152,8 @@ exports.getProfile = async (req, res) => {
       name: user.name,
       role: user.role,
       createdAt: user.createdAt,
-      walletBalance: user.walletBalance
+      walletBalance: user.walletBalance,
+      earnings: user.earnings || 0
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -161,25 +162,31 @@ exports.getProfile = async (req, res) => {
 
 
 exports.forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  console.log("Forgot password request for email:", email);
 
   try {
 
-    const user = await User.findOne({ email: req.body.email });
+    const user = await User.findOne({ email: email?.toLowerCase().trim() });
 
     if (!user) {
+      console.log("User not found for email:", email);
       return res.status(404).json({ message: "User not found" });
     }
 
-    const token = crypto.randomBytes(32).toString("hex");
+    console.log("User found, generating JWT reset token...");
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "15m" });
 
     user.resetToken = token;
-    user.resetTokenExpiry = Date.now() + 3600000;
+    user.resetTokenExpiry = Date.now() + 900000; // 15 minutes
 
     await user.save();
+    console.log("Reset token saved to database.");
 
     const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
     const resetLink = `${frontendUrl}/reset-password/${token}`;
 
+    console.log("Sending reset email to:", user.email);
     await sendEmail(
       user.email,
       "Reset Password",
@@ -187,10 +194,12 @@ exports.forgotPassword = async (req, res) => {
        <a href="${resetLink}">${resetLink}</a>`
     );
 
-    res.json({ message: "Reset password email sent" });
+    console.log("Reset email sent successfully.");
+    res.status(200).json({ message: "Reset link sent successfully" });
 
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Forgot password error:", error);
+    res.status(500).json({ message: "Internal server error", error: error.message });
   }
 
 };

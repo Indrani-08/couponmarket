@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../services/api";
 import initialCoupons from "../data/coupons.json";
 import "./CouponsPage.css";
 
@@ -89,30 +89,24 @@ function CouponsPage() {
     useEffect(() => {
 
         const fetchCoupons = async () => {
-
             try {
-
-                const res = await axios.get("http://localhost:5000/api/coupons");
-
+                const res = await api.get("/coupons");
                 const dbCoupons = res.data;
                 const today = new Date();
-
                 const stored = JSON.parse(localStorage.getItem("coupons") || "[]");
 
                 const updated = dbCoupons.map(c => {
-
                     const existing = stored.find(s => s._id === c._id);
                     const expiryStr = c.expiryDate ? new Date(c.expiryDate).toISOString().split('T')[0] : (c.expiry || "");
 
                     return {
                         ...c,
-                        id: c._id, // keep compatibility with your UI
+                        id: c._id, 
                         expiry: expiryStr,
-                        claimed: existing ? existing.claimed : false,
+                        claimed: c.status === "SOLD" || (existing ? existing.claimed : false),
                         locked: existing ? existing.locked : false,
                         expired: new Date(c.expiryDate || c.expiry) < today
                     };
-
                 });
 
                 const uploadedCoupons = stored.filter(
@@ -120,27 +114,17 @@ function CouponsPage() {
                 );
 
                 updated.unshift(...uploadedCoupons);
-
-                setCoupons(updated);
-
+                setCoupons(updated.filter(c => c.status === "AVAILABLE" || !c.status)); // Keep local coupons
                 localStorage.setItem("coupons", JSON.stringify(updated));
-
             } catch (error) {
-
-                console.log("Backend not available, using local JSON");
-
-                /* fallback to local json */
+                console.log("Backend not available or error, using local JSON");
                 const today = new Date();
-
                 const updated = initialCoupons.map(c => ({
                     ...c,
                     expired: new Date(c.expiry) < today
                 }));
-
                 setCoupons(updated);
-
             }
-
         };
 
         fetchCoupons();

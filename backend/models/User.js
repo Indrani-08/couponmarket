@@ -48,6 +48,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ["USER", "ADMIN", "user", "admin"],
     default: "USER"
+  },
+  earnings: {
+    type: Number,
+    default: 0
   }
 
 }, { timestamps: true });
